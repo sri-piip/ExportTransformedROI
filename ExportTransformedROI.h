@@ -1,3 +1,24 @@
+/*********************************************************************************
+**********************************************************************************
+
+	ExportTransformedROI is a plugin for PathCore Sedeen Viewer.
+
+	This plugin has been developed by Rushin Shojaii
+	in Dr. Anne Martel lab at Sunybrook Research Institute.
+
+	This is a part of pathology image informatics platform (PIIP)
+	funded by NIH.
+
+	Contact info: rushin.shojaii@sri.utoronto.ca
+
+	Date of the release of the code: April 26, 2017
+
+**********************************************************************************
+**********************************************************************************/
+
+
+
+
 #ifndef DPTK_SRC_PLUGINS_EXPORTTRANSFORMEDROI_H
 #define DPTK_SRC_PLUGINS_EXPORTTRANSFORMEDROI_H
 

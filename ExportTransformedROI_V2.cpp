@@ -18,7 +18,7 @@
 
 
 // Primary header
-#include "C:/Program Files (x86)/Sedeen Viewer SDK/v5.2.1.427/msvc2012/examples/plugins/ExportTransformedROI/ExportTransformedROI.h"
+#include "ExportTransformedROI.h"
 
 #include <algorithm>
 #include <cassert>

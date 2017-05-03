@@ -27,7 +27,9 @@
 #include <iostream>
 #include <fstream>
 #include <math.h>
-#include <afxdlgs.h>
+
+#include <Windows.h>
+#include <ShObjIdl.h>
 
 // Poco header needed for the macros below 
 #include <Poco/ClassLibrary.h>
@@ -43,6 +45,56 @@ namespace sedeen {
 using namespace image; 
 namespace algorithm {
 
+std::string getImageLocation()
+{
+  IFileSaveDialog* pFileSave;
+
+  std::wstring widePath = L"";
+
+  auto hr = CoCreateInstance(CLSID_FileSaveDialog, NULL, CLSCTX_ALL,
+			  IID_IFileSaveDialog, reinterpret_cast<void**>(&pFileSave));
+
+  if (SUCCEEDED(hr)) {
+	COMDLG_FILTERSPEC fileTypes[] =
+	{
+	  { L"All Files", L"*.*"}
+	};
+
+	pFileSave->SetFileTypes(1, fileTypes);
+	auto hr = pFileSave->Show(NULL);
+
+	if (SUCCEEDED(hr)) {
+	  IShellItem *pItem;
+	  hr = pFileSave->GetResult(&pItem);
+	  
+	  if (SUCCEEDED(hr)) {
+		PWSTR pszFilePath;
+
+		hr = pItem->GetDisplayName(SIGDN_FILESYSPATH, &pszFilePath);
+
+		if (SUCCEEDED(hr)) {
+		  widePath = pszFilePath;
+		  CoTaskMemFree(pszFilePath);
+		}
+		pItem->Release();
+	  }
+	}
+	pFileSave->Release();
+  }
+
+  CoUninitialize();
+
+  if (widePath.empty())
+	return "";
+
+  auto wideStrLen = widePath.length();
+  auto len = WideCharToMultiByte(CP_ACP, 0, widePath.c_str(), wideStrLen, 0, 0, 0, 0);
+
+  std::string result(len, '\0');
+  WideCharToMultiByte(CP_ACP, 0, widePath.c_str(), wideStrLen, &result[0], len, 0, 0);
+
+  return result;
+}
 
 ExportTransformedROI::ExportTransformedROI()
 		:image_list_(),
@@ -104,31 +156,36 @@ bool ExportTransformedROI::buildPipeline()
 	auto extpos = activeimagefile.find('.', activeimagefile.size());
 	auto activeImageName = activeimagefile.substr(npos + 1, extpos-1);
 
-	TCHAR szFilters[] = _T("All Files (*.*)|*.*|");   
-	CFileDialog fileDlg(FALSE, "", "", OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST | OFN_HIDEREADONLY | OFN_NOREADONLYRETURN, szFilters);
+	auto filepath = getImageLocation();
 
-	if (fileDlg.DoModal() == IDOK)
+	if (!filepath.empty())
 	{
-		auto pathName = fileDlg.GetPathName();
-
-		Session sTImage = Session(pathName.GetString());
+		Session sTImage = Session(filepath);
 		Session sOImage = Session(imageinfo.location);  // Original active image session
 
 		sedeen::Size Tsize;
 		sedeen::Size Osize;
 		 
 		auto imgopener = image::createImageOpener();
-		auto destLoc = file::Location((std::string(pathName)).c_str());
+		auto destLoc = file::Location(filepath);
 		auto dest_image_ = imgopener->open(destLoc);
+
+		if (!dest_image_) {
+		  throw std::runtime_error("Could not open image for writing at: " + destLoc.getFilename());
+		}
 
 		int dest_width = dest_image_->getMetaData()->get(image::IntegerTags::IMAGE_X_DIMENSION, 0);
 		int dest_height = dest_image_->getMetaData()->get(image::IntegerTags::IMAGE_Y_DIMENSION, 0);
 
-		double x_spacing = dest_image_->getMetaData()->get(image::DoubleTags::PIXEL_SIZE_X, 0);
-		double y_spacing = dest_image_->getMetaData()->get(image::DoubleTags::PIXEL_SIZE_Y, 0);
+		double x_spacing = 1.0;
+		double y_spacing = 1.0;
 
-		double x_centre = dest_image_->getMetaData()->get(image::DoubleTags::IMAGE_CENTRE_X, 0);
-		double y_centre = dest_image_->getMetaData()->get(image::DoubleTags::IMAGE_CENTRE_Y, 0);
+		if (dest_image_->getMetaData()->has(image::DoubleTags::PIXEL_SIZE_X)) {
+			  x_spacing = dest_image_->getMetaData()->get(image::DoubleTags::PIXEL_SIZE_X, 0);
+		}
+		if (dest_image_->getMetaData()->has(image::DoubleTags::PIXEL_SIZE_Y)) {
+			  y_spacing = dest_image_->getMetaData()->get(image::DoubleTags::PIXEL_SIZE_Y, 0);
+		}
 
 		SRTTransform pointTargetTransform(0, 0, 1, 1, 0, 0, 0);
 		if (sTImage.loadFromFile() == TRUE)

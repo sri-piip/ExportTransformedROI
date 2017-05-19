@@ -9,7 +9,7 @@ This plugin is designed to copy regions of interest from one image to another as
 Currently this plugin **works with images with the same resolution**. This feature will be incorporated in the next version of the plugin.
 
 ## User Manual
-Please refer to the PdF file provided here.
+Please refer to the PDF file provided [here](https://github.com/sedeen-piip-plugins/ExportTransformedROI/blob/master/ExportTrandformedROI_UserManual.pdf)
 
 ## Bugs
 Before exporting the ROIs to the selected image, the user is mistakenly asked to confirm replacing the image. However, the plugin only exports and adds the ROIs to the selected image whitout replacing the image. Therefore, the user needs to choose "Yes" at this step.

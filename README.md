@@ -3,7 +3,7 @@
 
 This plugin is designed to copy regions of interest from one image to another. It also takes into account any transformations used to align the source and the target images.
 
-![alt text][]
+![alt text](https://github.com/sedeen-piip-plugins/ExportTransformedROI/blob/master/ExportTransformedROI_Image.png "Exported ROIs on the Aligned Images")
 
 ## Notes
 Currently this plugin **works with images with the same resolution**. This feature will be incorporated in the next version of the plugin.

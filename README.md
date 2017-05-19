@@ -19,3 +19,6 @@ Funding provided by NIH.
 
 ## License
 
+]]></content>
+  <tabTrigger>readme</tabTrigger>
+</snippet>

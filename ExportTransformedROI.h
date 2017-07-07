@@ -17,8 +17,6 @@
 **********************************************************************************/
 
 
-
-
 #ifndef DPTK_SRC_PLUGINS_EXPORTTRANSFORMEDROI_H
 #define DPTK_SRC_PLUGINS_EXPORTTRANSFORMEDROI_H
 
@@ -46,6 +44,15 @@
 namespace sedeen {
 namespace algorithm {
 
+	struct ImageAttr
+	{
+		sedeen::SizeF	spacing;
+		sedeen::Size size;
+		sedeen::PointF centre;
+
+		double x_centre;
+		double y_centre;
+	};
 
 class ExportTransformedROI : public AlgorithmBase 
 {
@@ -56,6 +63,10 @@ class ExportTransformedROI : public AlgorithmBase
 	virtual void run();
 	virtual void init(const image::ImageHandle& image);
 	bool buildPipeline();
+	SizeF getPixelSpacing(const image::ImageHandle& image);
+	ImageAttr GetImageInfo(const image::ImageHandle& image); 
+	ImageAttr GetImageInfo(std::basic_string<char, std::char_traits<char>, std::allocator<char>> destImage);
+	
 
  private:
 	TextResult output_text_;
@@ -64,6 +75,7 @@ class ExportTransformedROI : public AlgorithmBase
 	ImageListParameter image_list_;
 	RegionListParameter region_list_;
     algorithm::DisplayAreaParameter display_area_;
+	
 };
 
 

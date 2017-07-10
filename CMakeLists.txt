@@ -9,7 +9,7 @@ FIND_PACKAGE( SEDEENSDK REQUIRED "C:/Program Files (x86)/Sedeen Viewer SDK/v5.2.
 
 ## Load Boost dependency
 SET (CMAKE_PREFIX_PATH "C:/Boost" )
-FIND_PACKAGE( OPENCV REQUIRED "C:/Boost" )
+FIND_PACKAGE( BOOST REQUIRED "C:/Boost" )
 
 INCLUDE_DIRECTORIES( "C:/Program Files (x86)/Sedeen Viewer SDK/v5.2.1.488/msvc2012/include" 
 					 "C:/Boost/include/boost-1_55")

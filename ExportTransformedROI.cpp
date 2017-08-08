@@ -78,7 +78,7 @@ void ExportTransformedROI::init(const image::ImageHandle& image)
 	region_list_ = createRegionListParameter(*this,
 		"Select ROI",
 		"Select ROI to be saved",
-		true);
+		false);
 
 	auto fDlgOptions = sedeen::file::FileDialogOptions();
 	fDlgOptions.caption = "Select Destination";

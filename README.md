@@ -12,5 +12,5 @@ This plugin works with images with different sizes and resolutions. ** Currently
 Please refer to the PDF file provided [here](https://github.com/sedeen-piip-plugins/ExportTransformedROI/blob/V3-DiffRes-SDKv5.2.2.579/ExportTrandformedROI_UserManual.pdf)
 
 ## Credits
-ExportTransformedROI plugin has been developed by Martel lab at Sunnybrook Research Institute (SRI), University of Toronto.
+ExportTransformedROI plugin has been developed by Rushin Shojaii in Martel lab at Sunnybrook Research Institute (SRI), University of Toronto.
 [Funding provided by NIH.](https://itcr.nci.nih.gov/funded-project/pathology-image-informatics-platform-visualization-analysis-and-management)

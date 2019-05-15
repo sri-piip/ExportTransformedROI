@@ -26,7 +26,7 @@
 #include <iostream>
 #include <fstream>
 #include <math.h>
-#include <afxdlgs.h>
+//#include <afxdlgs.h>
 #include "boost\range\algorithm.hpp"
 #include "boost\filesystem.hpp"
 

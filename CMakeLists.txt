@@ -1,32 +1,66 @@
 PROJECT( ExportTransformedROI )
-CMAKE_MINIMUM_REQUIRED( VERSION 2.8 )
-CMAKE_POLICY( SET CMP0053 OLD )
+CMAKE_MINIMUM_REQUIRED( VERSION 3.8 )
+# Enable C++17 features
+SET(CMAKE_CXX_STANDARD 17)
 
-##
-## Load the Sedeen dependencies
-SET( CMAKE_PREFIX_PATH "C:/Program Files (x86)/Sedeen Viewer SDK/v5.2.3.629/msvc2012" )
-FIND_PACKAGE( SEDEENSDK REQUIRED "C:/Program Files (x86)/Sedeen Viewer SDK/v5.2.3.629/msvc2012" )
+# Define project description variables
+SET( DISPLAY_NAME_TEXT "ExportTransformedROI 5.4.0.20181217" CACHE STRING "Name of the plugin as it should be displayed in Sedeen Viewer")
+SET( SUPPORT_URL_TEXT "http://pathcore.com/support/plugin/info/${PROJECT_NAME}" CACHE STRING "Location users can find help with the plugin" )
+SET( DEVELOPER_TEXT "Sunnybrook Research Institute" CACHE STRING "Name of the author or organization that created the plugin" )
 
-## Load Boost dependency
-SET (CMAKE_PREFIX_PATH "C:/Boost" )
-FIND_PACKAGE( BOOST REQUIRED "C:/Boost" )
+# Load the Sedeen dependencies
+SET(PROGRAMFILESX86 "PROGRAMFILES\(X86\)")
+FIND_PACKAGE( SEDEENSDK REQUIRED 
+                HINTS ../../.. 
+                    "$ENV{${PROGRAMFILESX86}}/Sedeen Viewer SDK/v5.4.1.20190327/msvc2017"
+                    "$ENV{PROGRAMFILES}/Sedeen Viewer SDK/v5.4.1.20190327/msvc2017" )
 
-INCLUDE_DIRECTORIES( "C:/Program Files (x86)/Sedeen Viewer SDK/v5.2.3.629/msvc2012/include" 
-					 "C:/Boost/include/boost-1_55")
-LINK_DIRECTORIES( "C:/Program Files (x86)/Sedeen Viewer SDK/v5.2.3.629/msvc2012/lib" 
-				  "C:/Boost/lib/i386")
+# The plugin depends on boost.filesystem
+IF(NOT BOOST_ROOT)
+  SET(BOOST_ROOT "BOOST_ROOT-NOTFOUND" CACHE PATH "Installation prefix of the Boost C++ libraries")
+ENDIF()
+IF(NOT BOOST_VERSION)
+  SET(BOOST_VERSION "BOOST_VERSION-NOTFOUND" CACHE STRING "Boost library version number")
+ENDIF()
+FIND_PACKAGE(Boost ${BOOST_VERSION} REQUIRED COMPONENTS
+                 filesystem )
+
+INCLUDE_DIRECTORIES( ${INCLUDE_DIRECTORIES} ${SEDEENSDK_INCLUDE_DIR} ${BOOST_ROOT})
+LINK_DIRECTORIES( ${LINK_DIRECTORIES} ${SEDEENSDK_LIBRARY_DIR} "${BOOST_ROOT}/stage/lib") 
 
 ##
 ## Build the code into a module library
-ADD_LIBRARY( ExportTransformedROI MODULE ExportTransformedROI.cpp ExportTransformedROI.h)
+ADD_LIBRARY( ${PROJECT_NAME} MODULE 
+                 ${PROJECT_NAME}.cpp ${PROJECT_NAME}.h 
+                 )
 
 # Link the library against the Sedeen libraries
 # NOTE: The QT libraries must be linked first.
-TARGET_LINK_LIBRARIES( ExportTransformedROI image.lib global.lib algorithm.lib archive.lib Comdlg32.lib propsys.lib )
+#TARGET_LINK_LIBRARIES( ExportTransformedROI image.lib global.lib algorithm.lib archive.lib Comdlg32.lib propsys.lib )
+# Link the library against the Sedeen SDK libraries
+TARGET_LINK_LIBRARIES( ${PROJECT_NAME} ${SEDEENSDK_LIBRARIES}
+                           Boost::filesystem )
 
-##
-## Install the plugin in the sedeen plugins directory
-##FIND_PACKAGE( PATHCORE REQUIRED "C:/Program Files (x86)/Sedeen Viewer" )
-##IF( ${PATHCORE_FOUND} )
-  INSTALL( TARGETS ExportTransformedROI LIBRARY DESTINATION "C:/Program Files (x86)/Sedeen Viewer/plugins/cpp/piip/ExportTransformedROI" )
-##ENDIF()
+#Create or update the .info file in the build directory
+STRING( TIMESTAMP DATE_CREATED_TEXT "%Y-%m-%d" )
+CONFIGURE_FILE( "infoTemplate.info.in" "${PROJECT_NAME}.info" )
+
+# Set the install destination directory
+IF( NOT PLUGIN_DESTINATION_DIR )
+  IF( ${SEDEEN_FOUND} )
+	SET( TEMPPLUGINDIR "${PATHCORE_DIR}/plugins/cpp/piip/${PROJECT_NAME}" )
+  ELSE()
+	SET( TEMPPLUGINDIR "PLUGIN_DESTINATION_DIR-NOTFOUND" )
+	MESSAGE( SEND_ERROR "PLUGIN_DESTINATION_DIR not found. Set this to the target installation directory of the plugin within Sedeen Viewer (e.g. $ENV{PROGRAMFILES}/Sedeen Viewer/plugins/cpp/piip/${PROJECT_NAME}).")
+  ENDIF()
+  SET(PLUGIN_DESTINATION_DIR ${TEMPPLUGINDIR} CACHE PATH "Installation directory for the plugin within Sedeen Viewer")
+ENDIF()
+
+# Install the plugin and .info file in the PLUGIN_DESTINATION_DIR directory
+IF( ${SEDEEN_FOUND} )
+  install(TARGETS ${PROJECT_NAME}
+      LIBRARY DESTINATION "${PLUGIN_DESTINATION_DIR}")
+  install(FILES "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.info"
+      DESTINATION "${PLUGIN_DESTINATION_DIR}")
+ENDIF()
+

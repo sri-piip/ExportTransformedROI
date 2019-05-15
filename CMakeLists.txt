@@ -4,7 +4,7 @@ CMAKE_MINIMUM_REQUIRED( VERSION 3.8 )
 SET(CMAKE_CXX_STANDARD 17)
 
 # Define project description variables
-SET( DISPLAY_NAME_TEXT "ExportTransformedROI 5.4.0.20181217" CACHE STRING "Name of the plugin as it should be displayed in Sedeen Viewer")
+SET( DISPLAY_NAME_TEXT "ExportTransformedROI 5.4.1.20190327" CACHE STRING "Name of the plugin as it should be displayed in Sedeen Viewer")
 SET( SUPPORT_URL_TEXT "http://pathcore.com/support/plugin/info/${PROJECT_NAME}" CACHE STRING "Location users can find help with the plugin" )
 SET( DEVELOPER_TEXT "Sunnybrook Research Institute" CACHE STRING "Name of the author or organization that created the plugin" )
 
@@ -15,18 +15,8 @@ FIND_PACKAGE( SEDEENSDK REQUIRED
                     "$ENV{${PROGRAMFILESX86}}/Sedeen Viewer SDK/v5.4.1.20190327/msvc2017"
                     "$ENV{PROGRAMFILES}/Sedeen Viewer SDK/v5.4.1.20190327/msvc2017" )
 
-# The plugin depends on boost.filesystem
-IF(NOT BOOST_ROOT)
-  SET(BOOST_ROOT "BOOST_ROOT-NOTFOUND" CACHE PATH "Installation prefix of the Boost C++ libraries")
-ENDIF()
-IF(NOT BOOST_VERSION)
-  SET(BOOST_VERSION "BOOST_VERSION-NOTFOUND" CACHE STRING "Boost library version number")
-ENDIF()
-FIND_PACKAGE(Boost ${BOOST_VERSION} REQUIRED COMPONENTS
-                 filesystem )
-
-INCLUDE_DIRECTORIES( ${INCLUDE_DIRECTORIES} ${SEDEENSDK_INCLUDE_DIR} ${BOOST_ROOT})
-LINK_DIRECTORIES( ${LINK_DIRECTORIES} ${SEDEENSDK_LIBRARY_DIR} "${BOOST_ROOT}/stage/lib") 
+INCLUDE_DIRECTORIES( ${INCLUDE_DIRECTORIES} ${SEDEENSDK_INCLUDE_DIR})
+LINK_DIRECTORIES( ${LINK_DIRECTORIES} ${SEDEENSDK_LIBRARY_DIR}) 
 
 ##
 ## Build the code into a module library
@@ -38,8 +28,7 @@ ADD_LIBRARY( ${PROJECT_NAME} MODULE
 # NOTE: The QT libraries must be linked first.
 #TARGET_LINK_LIBRARIES( ExportTransformedROI image.lib global.lib algorithm.lib archive.lib Comdlg32.lib propsys.lib )
 # Link the library against the Sedeen SDK libraries
-TARGET_LINK_LIBRARIES( ${PROJECT_NAME} ${SEDEENSDK_LIBRARIES}
-                           Boost::filesystem )
+TARGET_LINK_LIBRARIES( ${PROJECT_NAME} ${SEDEENSDK_LIBRARIES} )
 
 #Create or update the .info file in the build directory
 STRING( TIMESTAMP DATE_CREATED_TEXT "%Y-%m-%d" )

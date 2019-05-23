@@ -26,10 +26,8 @@
 #include <iostream>
 #include <fstream>
 #include <math.h>
-#include <afxdlgs.h>
-#include "boost\range\algorithm.hpp"
-#include "boost\filesystem.hpp"
-
+//#include <afxdlgs.h>
+#include <filesystem> //Requires C++17
 
 // Poco header needed for the macros below 
 #include <Poco/ClassLibrary.h>
@@ -41,7 +39,7 @@ POCO_EXPORT_CLASS(sedeen::algorithm::ExportTransformedROI)
 POCO_END_MANIFEST
 
 using namespace std;
-using namespace boost;
+
 namespace sedeen {
 using namespace image; 
 namespace algorithm {
@@ -158,7 +156,7 @@ bool ExportTransformedROI::buildPipeline()
 	auto s_spacing = getPixelSpacing(image());
 	auto s_imageinfo = image_list_.info(image_list_.indexOf(image()));
 	auto s_transform = s_imageinfo.transform;
-	boost::filesystem::path s_imagefilename(s_imageinfo.location);
+    std::filesystem::path s_imagefilename(s_imageinfo.location);
 
 
 	sedeen::algorithm::parameter::SaveFileDialog::DataType t_imagefiledata = target_location_;
@@ -244,8 +242,8 @@ bool ExportTransformedROI::buildPipeline()
 			output_GraphicsDescript[i].setGeometry(sgDesc->getGeometry());
 			output_GraphicsDescript[i].setDescription(sgDesc->getDescription());
 			output_GraphicsDescript[i].setStyle(sgDesc->getStyle());
-			auto graphicsNewName = boost::filesystem::path(sgDesc->getName() + std::string("_") + s_imagefilename.stem().string());
-			output_GraphicsDescript[i].setName(graphicsNewName.string().c_str());
+            auto graphicsNewName = std::filesystem::path(sgDesc->getName() + std::string("_") + s_imagefilename.stem().string());
+            output_GraphicsDescript[i].setName(graphicsNewName.string().c_str());
 
 			auto gpoints = sgDesc->getPoints();
 			for (int k = 0; k < gpoints.size(); k++)
